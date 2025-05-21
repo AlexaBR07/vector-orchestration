@@ -1,0 +1,33 @@
+version: '3.9'
+
+services:
+  upload-api:
+    image: upload-api:latest  # Imagen local o del registry
+    build:
+      context: ../upload-api  # Ruta al código fuente del upload-api (opcional si quieres build local)
+    ports:
+      - "8000:8000"
+    depends_on:
+      - vector-db-api
+    environment:
+      - VECTOR_DB_API_URL=http://vector-db-api:8001
+    networks:
+      - vector-net
+
+  vector-db-api:
+    image: vector-db-api:latest  # Imagen local o del registry
+    build:
+      context: ../vector-db-api  # Ruta al código fuente del vector-db-api (opcional si quieres build local)
+    ports:
+      - "8001:8001"
+    volumes:
+      - vector-db-data:/app/chroma_db
+    networks:
+      - vector-net
+
+volumes:
+  vector-db-data:
+
+networks:
+  vector-net:
+    driver: bridge
