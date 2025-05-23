@@ -25,8 +25,40 @@ services:
     networks:
       - vector-net
 
+  express-api:
+    image: express-api:latest  # Imagen local o del registry
+    build:
+      context: ../express-api  # Ruta al código fuente del express-api (opcional si quieres build local)
+    ports:
+      - "3000:3000"
+    depends_on:
+      - upload-api
+      - ollama
+    environment:
+      - FASTAPI_URL=http://vector-db-api:8001/query-vectors
+      - OLLAMA_URL=http://ollama:11434/api/generate
+    networks:
+      - vector-net
+  
+  ollama:
+    image: ollama/ollama:latest  # Imagen local o del registry)
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    entrypoint: >
+      /bin/bash -c "
+        ollama serve &
+        sleep 2 &&
+        ollama pull mistral &&
+        tail -f /dev/null
+      "
+    networks:
+      - vector-net
+
 volumes:
   vector-db-data:
+  ollama_data:
 
 networks:
   vector-net:
