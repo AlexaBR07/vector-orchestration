@@ -56,6 +56,18 @@ services:
     networks:
       - vector-net
 
+  discord-bot:
+    image: discord-bot:latest
+    build:
+      context: ../discord-bot
+    depends_on:
+      - express-api
+    environment:
+      - DISCORD_TOKEN=tu_token_aqui
+      - EXPRESS_API_URL=http://express-api:3000
+    networks:
+      - vector-net
+
 volumes:
   vector-db-data:
   ollama_data:
